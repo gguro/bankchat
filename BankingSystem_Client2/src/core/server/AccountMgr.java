@@ -42,6 +42,16 @@ public class AccountMgr {
 		return result != null;
 	}
 	
+	public boolean removeAccount(String accountNo) throws BMSException {
+		if(accMap.containsKey(accountNo)) {
+			accMap.remove(accountNo);
+		} else {
+			throw new BMSException("WRN : Invalid account!");
+		}
+		
+		return true;
+	}
+	
 	public boolean depositAccount(String accountNo, int amount) throws BMSException {
 		if(!accMap.containsKey(accountNo)) {
 			throw new BMSException("WRN: Invaild account!");
@@ -55,6 +65,21 @@ public class AccountMgr {
 		}
 		
 		return accMap.get(accountNo).withdraw(amount);
+	}
+	
+	public boolean transferAccount(String accountNo, String to, int amount) throws BMSException {
+		if(!accMap.containsKey(accountNo) || !accMap.containsKey(to)) {
+			throw new BMSException("WRN : Invalid account!");
+		}
+		
+		if(accMap.get(accountNo).getBalance() < amount) {
+			throw new BMSException("WRN : Not enough money");
+		}
+		
+		accMap.get(accountNo).withdraw(amount);
+		accMap.get(to).deposit(amount);
+		
+		return true;
 	}
 	
 	public boolean saveAccountInfo() {

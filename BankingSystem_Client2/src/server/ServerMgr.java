@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
 
+import core.common.Account;
 import core.common.Logger;
 import core.server.AccountMgr;
 import core.server.ServerProperties;
@@ -43,7 +44,25 @@ public class ServerMgr {
 			transMgr = new TransactionMgr(props);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			
 		}
+	}
+	public boolean login(Account account) {
+		
+		return true;
+	}
+	
+	public boolean create(Account account) {
+		
+		try {
+			accMgr.addAccount(account);
+		} catch (BMSException e) {
+			// TODO Auto-generated catch block
+			logger.log(e.getMessage());
+			return false;
+		}
+		
+		return true;
 	}
 	
 	
@@ -53,7 +72,8 @@ public class ServerMgr {
 		} catch (BMSException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			System.out.println(e.getMessage());
+			logger.log(e.getMessage());
+			return false;
 		}
 		return true;
 	}
@@ -64,9 +84,35 @@ public class ServerMgr {
 		} catch (BMSException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			
+			logger.log(e.getMessage());	
+			return false;
 		}
 		return true;
+	}
+	
+	public boolean transfer(String accountNo, String to, int amount) {
+		try {
+			accMgr.transferAccount(accountNo, to, amount);
+		} catch (BMSException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			logger.log(e.getMessage());
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean remove(String accountNo) {
+		try {
+			accMgr.removeAccount(accountNo);
+		} catch (BMSException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			logger.log(e.getMessage());
+			return false;
+		}
+		return true;
+		
 	}
 	
 	

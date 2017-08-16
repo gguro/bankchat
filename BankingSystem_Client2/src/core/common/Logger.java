@@ -13,6 +13,7 @@ public class Logger {
 	private static Logger instance;
 	private static String logFileName = "logger.log";
 	private static PrintWriter pw;
+	private static boolean displayScreen = true;
 	
 	private Logger() {}
 	
@@ -30,7 +31,15 @@ public class Logger {
 		return instance;
 	}
 	
+	public static void setDisplayScreen(boolean bDisplay) {
+		displayScreen = bDisplay;
+	}
+	
 	public void log(String msg) {
+		if(displayScreen) {
+			System.out.println(msg);
+		}
+		
 		pw.println("[" + LocalTime.now() + "] : " + msg);
 		pw.flush();
 	}
