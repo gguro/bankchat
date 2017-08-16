@@ -1,14 +1,9 @@
 package test;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 import core.common.Account;
-import core.common.Transaction;
 import core.server.AccountMgr;
-import core.server.ServerProperties;
 import exception.BMSException;
 
 public class AccountManagerTest {
@@ -44,9 +39,8 @@ public class AccountManagerTest {
 			accMgr.withdrawAccount(accountNo, 100);
 		} catch (BMSException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
-		
 		
 		System.out.println(accMgr);
 		

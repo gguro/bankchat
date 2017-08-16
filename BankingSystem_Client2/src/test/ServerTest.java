@@ -1,6 +1,7 @@
 package test;
 
 import core.common.Account;
+import exception.BMSException;
 import server.ServerMgr;
 
 public class ServerTest {
@@ -9,8 +10,19 @@ public class ServerTest {
 		
 		String accountNo = "12341234";
 		
-		smgr.deposit(accountNo, 200);
-		smgr.deposit(accountNo, 100);
+		try {
+			smgr.deposit(accountNo, 200);
+		} catch (BMSException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+		}
+		
+		try {
+			smgr.deposit(accountNo, 100);
+		} catch (BMSException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+		}
 		
 		smgr.shutDown();
 		

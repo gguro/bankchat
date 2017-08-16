@@ -66,37 +66,21 @@ public class ServerMgr {
 		server.start();
 	}
 		
-	public boolean login(String accountNo, String password) {
+	public boolean login(String accountNo, String password) throws BMSException {
 		logger.log("Login : " + accountNo);
 		
 		boolean result = false;
-		try {
-			result = accMgr.loginAccount(accountNo, password);
-			if(result == true) {
-				logger.log(accountNo + " 로그인 성공");
-			} else {
-				logger.log(accountNo + " 로그인 실패");
-			}
-		} catch (BMSException e) {
-			// TODO Auto-generated catch block
-			logger.log(e.getMessage());
-			return false;
-		}
+		
+		result = accMgr.loginAccount(accountNo, password);
 		
 		return result;
 	}
 	
-	public boolean create(Account account) {
+	public boolean create(Account account) throws BMSException {
 		logger.log(">> 계좌 생성 : " + account.getAccountNo() +", " + account.getName());
-		try {
-			accMgr.addAccount(account);
-		} catch (BMSException e) {
-			// TODO Auto-generated catch block
-			logger.log(e.getMessage());
-			return false;
-		}
 		
-		return true;
+		return accMgr.addAccount(account);
+
 	}
 	
 	public Account getAccount(String accountNo) {
@@ -104,79 +88,47 @@ public class ServerMgr {
 	}
 	
 	
-	public boolean withdraw(String accountNo, int amount) {
-		boolean result = false;
-		
+	public boolean withdraw(String accountNo, int amount) throws BMSException {
 		logger.log(">> 출금 : " + accountNo + ", " + amount);
 		
-		try {
-			accMgr.withdrawAccount(accountNo, amount);
-			if(result == true) {
-				transMgr.addTrans(accountNo, new Transaction(accountNo, accountNo, "", amount));
-			}
-			
-		} catch (BMSException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			logger.log(e.getMessage());
-			return false;
+		boolean result = accMgr.withdrawAccount(accountNo, amount);
+		if (result == true) {
+			transMgr.addTrans(accountNo, new Transaction(accountNo, accountNo, "", amount));
 		}
-		return true;
+		
+		return result;
 	}
 	
-	public boolean deposit(String accountNo, int amount) {
-		boolean result = false;
-		
+	public boolean deposit(String accountNo, int amount) throws BMSException {
 		logger.log(">> 입금 : " + accountNo + ", " + amount);
-		try {
-			result = accMgr.depositAccount(accountNo, amount);
-			if(result == true) {
-				transMgr.addTrans(accountNo, new Transaction(accountNo, "", accountNo, amount));
-			}
-			
-		} catch (BMSException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			logger.log(e.getMessage());	
-			return false;
+		
+		boolean result = accMgr.depositAccount(accountNo, amount);
+		if(result == true) {
+			transMgr.addTrans(accountNo, new Transaction(accountNo, "", accountNo, amount));
 		}
+		
 		return result;
 	}
 	
-	public boolean transfer(String accountNo, String to, int amount) {
-		boolean result = false;
-		
+	public boolean transfer(String accountNo, String to, int amount) throws BMSException {
 		logger.log(">> 이체 : " + accountNo + ", " + to + ", " + amount);
-		try {
-			result = accMgr.transferAccount(accountNo, to, amount);
-			if(result == true) {
-				transMgr.addTrans(accountNo, new Transaction(accountNo, accountNo, to, amount));
-				transMgr.addTrans(to, new Transaction(to, accountNo, to, amount));
-			}
-
-		} catch (BMSException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			logger.log(e.getMessage());
-			return false;
+		
+		
+		boolean result = accMgr.transferAccount(accountNo, to, amount);
+		if(result == true) {
+			transMgr.addTrans(accountNo, new Transaction(accountNo, accountNo, to, amount));
+			transMgr.addTrans(to, new Transaction(to, accountNo, to, amount));
 		}
 		return result;
 	}
 	
-	public boolean remove(String accountNo) {
+	public boolean remove(String accountNo) throws BMSException {
 		logger.log(">> 계정삭제 : " + accountNo);
-		try {
-			accMgr.removeAccount(accountNo);
-		} catch (BMSException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			logger.log(e.getMessage());
-			return false;
-		}
-		return true;
 		
+		boolean result = accMgr.removeAccount(accountNo); 
+		
+		return result;
 	}
-	
 	
 	public void shutDown() {
 		accMgr.saveAccountInfo();

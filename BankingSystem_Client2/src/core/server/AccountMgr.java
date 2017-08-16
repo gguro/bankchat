@@ -37,9 +37,9 @@ public class AccountMgr {
 			throw new BMSException("WRN : Duplicate account number!");
 		} 
 		
-		Account result = accMap.put(acc.getAccountNo(), acc);
+		accMap.put(acc.getAccountNo(), acc);
 		
-		return result != null;
+		return true;
 	}
 	
 	public boolean removeAccount(String accountNo) throws BMSException {

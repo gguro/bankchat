@@ -12,6 +12,7 @@ import core.common.Account;
 import core.common.Logger;
 import core.message.AccountMessage;
 import core.message.Message;
+import exception.BMSException;
 
 public class Server extends Thread {
 	private Vector<ToClient> clientList = null;
@@ -93,6 +94,23 @@ public class Server extends Thread {
 		}
 	}
 	
+	public void sendTragetUser(String targetUserId, Message msg) {
+		Iterator<ToClient> iterator = clientList.iterator();
+		while (iterator.hasNext()) {
+			ToClient temp = iterator.next();
+			if(temp.userId.equals(targetUserId)) {
+				try {
+					temp.oos.writeObject(msg);
+					temp.oos.flush();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				break;
+			}
+		}
+	}
+	
 	public class ToClient extends Thread{
 		private Socket client;
 		private String userId;
@@ -116,9 +134,27 @@ public class Server extends Thread {
 			}
 		}
 		
+		public void sendFailMsg(Message msg, String message) {
+			try {
+				oos.writeObject(msg);
+				oos.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			logger.log("ERR : " + msg.toString() + ", " + message);
+		}
 		
-		public void writeSuccessLog(Message msg) {
+		
+		public void sendSuccessMsg(Message msg) {
 			String order = msg.getOrder();
+			
+			try {
+				oos.writeObject(msg);
+				oos.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			
 			if("chat".equals(order) || "join".equals(order) || "whisper".equals(order)) {
 				logger.log(msg.toString() + " 성공");
@@ -193,14 +229,8 @@ public class Server extends Thread {
 			
 			msg.setMessage("join", "님 입장", userId);
 			
-			try {
-				oos.writeObject(msg);
-				broadcastToAllUser(msg);
-				writeSuccessLog(msg);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			sendSuccessMsg(msg);
+			broadcastToAllUser(msg);
 			
 		}
 
@@ -212,44 +242,34 @@ public class Server extends Thread {
 			
 				msg.setMessage("join", "님 입장", userId);
 				
-				try {
-					oos.writeObject(msg);
-					broadcastToAllUser(msg);
-					writeSuccessLog(msg);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				broadcastToAllUser(msg);
+				sendSuccessMsg(msg);
 			} else {
 				AccountMessage accMsg = (AccountMessage) msg;
 				boolean result = false;
 				
-				result = serverMgr.login(accMsg.getId(), accMsg.getPassword());
-				if (result == true) {
-					userId = accMsg.getId();
-					//클라이언트에게 완료 메시지 송신
-					try {
-						oos.writeObject(accMsg);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+				try {
+					result = serverMgr.login(accMsg.getId(), accMsg.getPassword());
+					if(result == true) {
+						sendSuccessMsg(msg);
+					} else {
+						sendFailMsg(msg, "로그인 실패");
 					}
-					//로그 저장
-					writeSuccessLog(msg);
-				} else {
-					
+				} catch (BMSException e) {
+					// TODO Auto-generated catch block
+					sendFailMsg(msg, e.getMessage());
 				}
 			}
-			
 		}
 		
 		private void processChatMessage(Message msg) {
 			msg.setMessage("chat", msg.getValue(), msg.getUserId());
 			broadcastToAllUser(msg);
-			writeSuccessLog(msg);
+			sendSuccessMsg(msg);
 		}
 		private void processWhisperMessage(Message msg) {
 			msg.setMessage("whisper", msg.getValue(), msg.getUserId());
+			sendTragetUser(msg.getUserId(), msg);
 			System.out.println("귓속말 처리 추가");
 		}
 		private void processCreateMessage(Message msg) {
@@ -261,32 +281,88 @@ public class Server extends Thread {
 			int interestRate = accMsg.getRate();
 			
 			Account account = new Account(accountNo, password, name, accountType, interestRate);
-			serverMgr.create(account);
+			boolean result;
+			try {
+				result = serverMgr.create(account);
+				if(result == true) {
+					sendSuccessMsg(accMsg);
+				} else {
+					sendFailMsg(accMsg, "계좌 생성 실패");
+				}
+					
+			} catch (BMSException e1) {
+				// TODO Auto-generated catch block
+				sendFailMsg(accMsg, e1.getMessage());
+			} 
 		}
 		private void processDepositMessage(Message msg) {
 			AccountMessage accMsg = (AccountMessage) msg;
 			int amount = Integer.parseInt(msg.getValue());
-			serverMgr.deposit(accMsg.getUserId(), amount);
+			boolean result;
+			try {
+				result = serverMgr.deposit(accMsg.getId(), amount);
+				if(result == true) {
+					sendSuccessMsg(accMsg);
+				} else {
+					sendFailMsg(accMsg, "입금 실패");
+				}
+			} catch (BMSException e) {
+				// TODO Auto-generated catch block
+				sendFailMsg(accMsg, e.getMessage());
+			}
 			
 		}
 		private void processWithdrawMessage(Message msg) {
 			AccountMessage accMsg = (AccountMessage) msg;
 			int amount = Integer.parseInt(msg.getValue());
-			serverMgr.withdraw(accMsg.getUserId(), amount);
+			boolean result;
+			
+			try {
+				result = serverMgr.withdraw(accMsg.getId(), amount);
+				if(result == true) {
+					sendSuccessMsg(accMsg);
+				} else {
+					sendFailMsg(accMsg, "출금 실패");
+				}
+			} catch (BMSException e) {
+				sendFailMsg(accMsg, e.getMessage());
+			}
 			
 		}
 		private void processTransferMessage(Message msg) {
 			AccountMessage accMsg = (AccountMessage) msg;
 			String to = accMsg.getTo();
 			int amount = Integer.parseInt(accMsg.getValue());
-			serverMgr.transfer(accMsg.getUserId(), to, amount);
+			boolean result;
+			try {
+				result = serverMgr.transfer(accMsg.getId(), to, amount);
+				if(result == true) {
+					sendSuccessMsg(accMsg);
+				} else {
+					sendFailMsg(accMsg, "이체 실패");
+				}
+			} catch (BMSException e) {
+				// TODO Auto-generated catch block
+				sendFailMsg(accMsg, e.getMessage());
+			}
 			
 		}
 		private void processRemoveMessage(Message msg) {
 			AccountMessage accMsg = (AccountMessage) msg;
 			String to = accMsg.getTo();
 			int amount = Integer.parseInt(accMsg.getValue());
-			serverMgr.transfer(accMsg.getUserId(), to, amount);
+			boolean result;
+			try {
+				result = serverMgr.transfer(accMsg.getId(), to, amount);
+				if(result == true) {
+					sendSuccessMsg(accMsg);
+				} else {
+					sendFailMsg(accMsg, "계정 삭제 실패");
+				}
+			} catch (BMSException e) {
+				// TODO Auto-generated catch block
+				sendFailMsg(accMsg, e.getMessage());
+			}
 		}
 		
 	}
