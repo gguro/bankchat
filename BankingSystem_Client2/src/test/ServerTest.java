@@ -5,7 +5,7 @@ import server.ServerMgr;
 
 public class ServerTest {
 	public static void main(String[] args) {
-		ServerMgr smgr = new ServerMgr();
+		ServerMgr smgr = new ServerMgr(null);
 		
 		String accountNo = "12341234";
 		

@@ -1,8 +1,13 @@
 package core.server;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import core.common.Account;
@@ -18,17 +23,12 @@ public class AccountMgr {
 		accMap = new HashMap<String, Account>();
 	}
 	
-	public AccountMgr(Properties prop) {
-		this.prop = prop;
-		accMap = new HashMap<String, Account>();
-		
-		if(loadAccountInfo()) {
-			
-		} 
-	}
-	
 	public Account getAccount(String accountNo) {
 		return accMap.get(accountNo);
+	}
+	
+	public Set <String> getAllAccountNo () {
+		return accMap.keySet();
 	}
 	
 	public boolean addAccount(Account acc) throws BMSException {
@@ -50,6 +50,18 @@ public class AccountMgr {
 		}
 		
 		return true;
+	}
+	
+	public boolean loginAccount(String accountNo, String password) throws BMSException{
+		if(!accMap.containsKey(accountNo)) {
+			throw new BMSException("WRN : Invalid account");
+		}
+		
+		if(accMap.get(accountNo).getPassword().equals(password)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public boolean depositAccount(String accountNo, int amount) throws BMSException {
@@ -82,6 +94,38 @@ public class AccountMgr {
 		return true;
 	}
 	
+	//계좌정보를 파일에 저장
+	public boolean saveAccountInfo() {
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream("accountInfo.txt");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(accMap);
+			oos.flush();
+			oos.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	//계좌정보를 파일에서 불러옴
+	public boolean loadAccountInfo() {
+		
+		FileInputStream fis;
+		try {
+			fis = new FileInputStream("accountInfo.txt");
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			accMap = (HashMap<String, Account>) ois.readObject();
+			ois.close();
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	/*
 	public boolean saveAccountInfo() {
 		System.out.println("-- Account 정보 저장 ");
 		
@@ -132,4 +176,6 @@ public class AccountMgr {
 		
 		return result;
 	}
+	*/
+	
 }

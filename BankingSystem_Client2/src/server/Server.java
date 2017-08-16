@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.Vector;
 
 import core.common.Account;
@@ -61,20 +62,34 @@ public class Server extends Thread {
 	}
 	
 	public void broadcastToAllUser(Message msg) {
-		for(ToClient client : clientList) {
+		
+		Iterator<ToClient> iterator = clientList.iterator();
+		while (iterator.hasNext()) {
+			ToClient temp = iterator.next();
 			try {
-				client.oos.writeObject(msg);
-				client.oos.flush();
+				temp.oos.writeObject(msg);
+				temp.oos.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		
+		logger.log(msg.toString());
+		
+//		for(ToClient client : clientList) {
+//			try {
+//				client.oos.writeObject(msg);
+//				client.oos.flush();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+		
 		// 입장일때 --님이 입장하셨습니다.
 		if(msg.getOrder().equals("join")) {
-			//frame.addText(msg.getUserId() + msg.getValue() + "\n");
+			serverMgr.getFrame().addText(msg.getUserId() + msg.getValue() + "\n");
 		} else {
-			//frame.addText("[" + msg.getUserId() + "] : " + msg.getValue() + "\n");
+			serverMgr.getFrame().addText("[" + msg.getUserId() + "] : " + msg.getValue() + "\n");
 		}
 	}
 	
@@ -122,6 +137,9 @@ public class Server extends Thread {
 				while((msg = (Message) ois.readObject()) != null ) {
 					String order = msg.getOrder();
 					
+					//if(order.equals("join")) {
+					//	processJoinMessage(msg);
+					//}
 					if(order.equals("login")) {
 						processLoginMessage(msg);
 					}
@@ -166,7 +184,7 @@ public class Server extends Thread {
 			}
 		}
 		
-		private void processLoginMessage(Message msg) {
+		private void processJoinMessage(Message msg) {
 			userId = msg.getValue();
 			if(userId.equals("")) {
 				userCount++;
@@ -185,6 +203,46 @@ public class Server extends Thread {
 			}
 			
 		}
+
+		private void processLoginMessage(Message msg) {
+			userId = msg.getValue();
+			if("guest".equals(userId)) {
+				userCount++;
+				userId = "손님" + userCount;
+			
+				msg.setMessage("join", "님 입장", userId);
+				
+				try {
+					oos.writeObject(msg);
+					broadcastToAllUser(msg);
+					writeSuccessLog(msg);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				AccountMessage accMsg = (AccountMessage) msg;
+				boolean result = false;
+				
+				result = serverMgr.login(accMsg.getId(), accMsg.getPassword());
+				if (result == true) {
+					userId = accMsg.getId();
+					//클라이언트에게 완료 메시지 송신
+					try {
+						oos.writeObject(accMsg);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					//로그 저장
+					writeSuccessLog(msg);
+				} else {
+					
+				}
+			}
+			
+		}
+		
 		private void processChatMessage(Message msg) {
 			msg.setMessage("chat", msg.getValue(), msg.getUserId());
 			broadcastToAllUser(msg);

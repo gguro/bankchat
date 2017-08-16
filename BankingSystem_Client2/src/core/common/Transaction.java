@@ -1,9 +1,10 @@
 package core.common;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class Transaction {
+public class Transaction implements Serializable {
 	String accountNo;	
 	String from; 
 	String to;

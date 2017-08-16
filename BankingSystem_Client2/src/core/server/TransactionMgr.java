@@ -1,13 +1,14 @@
 package core.server;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.Set;
 
 import core.common.Transaction;
 
@@ -18,16 +19,43 @@ public class TransactionMgr {
 		super();
 		//this.transList = new HashMap<String, List<Transaction>>();
 		transMap = new HashMap<String, List<Transaction>>();
+		loadTransactionInfo();
 	}
 	
+//	public TransactionMgr() {
+//		transMap = new HashMap<String, List<Transaction>>();
+//		
+//		
+//	}
 	
-	
-	public TransactionMgr(Properties prop) {
-		transMap = new HashMap<String, List<Transaction>>();
-		
-		loadTransactionInfo(prop);
+	public boolean loadTransactionInfo() {
+		FileInputStream fis;
+		try {
+			fis = new FileInputStream("transactionInfo.txt");
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			transMap = (Map<String, List<Transaction>>) ois.readObject();
+			ois.close();
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
 	}
 	
+	public boolean saveTransactionInfo () {
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream("transactionInfo.txt");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(transMap);
+			oos.flush();
+			oos.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	/*
 	public boolean loadTransactionInfo(Properties prop) {
 		boolean result = false;
 		String accountIDs = prop.getProperty("accountIDs");
@@ -99,8 +127,14 @@ public class TransactionMgr {
 		
 		return result;
 	}
+	*/
+	
+	public Set<String> getAllAcountNo() {
+		return transMap.keySet();
+	}
 	
 	public List<Transaction> getList(String accountNo) {
+		
 		return transMap.get(accountNo);
 	}
 	
@@ -121,9 +155,4 @@ public class TransactionMgr {
 		
 		return true;
 	}
-	
-	
-	
-	
-	
 }
