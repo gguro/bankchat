@@ -1,4 +1,4 @@
-package dialog;
+package server;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;

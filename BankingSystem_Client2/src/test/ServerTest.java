@@ -2,7 +2,7 @@ package test;
 
 import common.Account;
 import exception.BMSException;
-import server.ServerMgr;
+import manager.ServerMgr;
 
 public class ServerTest {
 	public static void main(String[] args) {

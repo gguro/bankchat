@@ -1,4 +1,4 @@
-package dialog;
+package server;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -13,7 +13,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import common.Account;
-import server.ServerMgr;
+import manager.ServerMgr;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;

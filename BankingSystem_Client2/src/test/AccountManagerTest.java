@@ -4,7 +4,7 @@ import java.util.Set;
 
 import common.Account;
 import exception.BMSException;
-import server.AccountMgr;
+import manager.AccountMgr;
 
 public class AccountManagerTest {
 	public static void main(String [] args) {

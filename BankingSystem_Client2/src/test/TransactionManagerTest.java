@@ -7,8 +7,8 @@ import java.util.Set;
 
 import common.Transaction;
 import exception.BMSException;
-import server.ServerProperties;
-import server.TransactionMgr;
+import manager.ServerProperties;
+import manager.TransactionMgr;
 
 public class TransactionManagerTest {
 	public static void main(String[] args) {

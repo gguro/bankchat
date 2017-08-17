@@ -1,4 +1,4 @@
-package dialog;
+package server;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -29,9 +29,9 @@ import javax.swing.table.DefaultTableModel;
 import common.Account;
 import common.Transaction;
 import exception.BMSException;
+import manager.ServerMgr;
+import manager.Server.ToClient;
 import message.Message;
-import server.ServerMgr;
-import server.Server.ToClient;
 
 public class ServerFrame2 extends JFrame {
 

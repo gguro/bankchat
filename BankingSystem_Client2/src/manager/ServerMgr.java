@@ -1,4 +1,4 @@
-package server;
+package manager;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,9 +12,9 @@ import javax.swing.table.DefaultTableModel;
 import common.Account;
 import common.Logger;
 import common.Transaction;
-import dialog.ServerFrame2;
 import exception.BMSException;
-import server.Server.ToClient;
+import manager.Server.ToClient;
+import server.ServerFrame2;
 
 public class ServerMgr {
 	ServerProperties props;
