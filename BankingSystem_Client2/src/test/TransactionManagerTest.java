@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import core.common.Transaction;
-import core.server.ServerProperties;
-import core.server.TransactionMgr;
+import common.Transaction;
+import server.ServerProperties;
+import server.TransactionMgr;
 
 public class TransactionManagerTest {
 	public static void main(String[] args) {

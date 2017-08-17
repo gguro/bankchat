@@ -1,4 +1,4 @@
-package core.common;
+package common;
 
 public interface AccountType {
 	int ACCOUNT_TYPE_NORMAL = 0;

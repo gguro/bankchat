@@ -1,6 +1,6 @@
 package test;
 
-import core.common.Logger;
+import common.Logger;
 
 public class LoggerTest {
 	public static void main(String[] args) {

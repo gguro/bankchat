@@ -1,6 +1,6 @@
 package test;
 
-import core.common.Account;
+import common.Account;
 
 public class AccountTest {
 

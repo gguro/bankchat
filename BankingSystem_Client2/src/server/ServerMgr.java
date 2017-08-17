@@ -4,12 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
 
-import core.common.Account;
-import core.common.Logger;
-import core.common.Transaction;
-import core.server.AccountMgr;
-import core.server.ServerProperties;
-import core.server.TransactionMgr;
+import common.Account;
+import common.Logger;
+import common.Transaction;
 import dialog.ServerFrame2;
 import exception.BMSException;
 

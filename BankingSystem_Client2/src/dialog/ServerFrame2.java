@@ -1,22 +1,7 @@
 package dialog;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-
-import core.common.Account;
-import core.message.Message;
-import server.ServerMgr;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JTextArea;
-import javax.swing.JButton;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -24,11 +9,23 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Vector;
-import java.awt.Color;
-import java.awt.event.ActionEvent;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+import common.Account;
+import message.Message;
+import server.ServerMgr;
 
 public class ServerFrame2 extends JFrame {
 
@@ -233,16 +230,17 @@ public class ServerFrame2 extends JFrame {
 	}
 
 	public void start() {
-		this.addWindowListener(new WindowAdapter(){
-	        public void windowClosing(WindowEvent e){
-	            serverMgr.shutDown();
-	            System.exit(0);//cierra aplicacion
-	        }
-	    });
-		
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				serverMgr.shutDown();
+				System.exit(0);// cierra aplicacion
+			}
+		});
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		// setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	}
+
 	//
 	// public AccountMgr getMgr() {
 	// return mgr;
@@ -260,13 +258,12 @@ public class ServerFrame2 extends JFrame {
 		chat.append(str);
 		jsb.setValue(jsb.getMaximum());
 	}
-	
-	
+
 	public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-        System.out.println("Terminate program!!!");
-        
+		System.out.println("Terminate program!!!");
+
 		System.exit(0);
-    }
+	}
 
 	/**
 	 * Launch the application.
@@ -339,6 +336,5 @@ public class ServerFrame2 extends JFrame {
 			}
 		}
 	}
-	
-	
+
 }

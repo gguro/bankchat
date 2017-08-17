@@ -3,7 +3,7 @@ package test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import core.server.ServerProperties;
+import server.ServerProperties;
 
 public class ServerPropertiesTest {
 	public static void main(String[] args) {

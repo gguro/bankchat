@@ -2,9 +2,9 @@ package test;
 
 import java.util.Set;
 
-import core.common.Account;
-import core.server.AccountMgr;
+import common.Account;
 import exception.BMSException;
+import server.AccountMgr;
 
 public class AccountManagerTest {
 	public static void main(String [] args) {

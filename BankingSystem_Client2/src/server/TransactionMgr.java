@@ -1,4 +1,4 @@
-package core.server;
+package server;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import core.common.Transaction;
+import common.Transaction;
 
 public class TransactionMgr {
 	private Map<String, List<Transaction>> transMap;

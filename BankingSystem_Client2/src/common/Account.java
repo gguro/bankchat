@@ -1,4 +1,4 @@
-package core.common;
+package common;
 
 import java.io.Serializable;
 
@@ -10,7 +10,7 @@ public class Account implements Serializable{
 	private int interestRate;
 	private int accountStaus;
 	private int balance;
-	private Logger logger;
+	private Logger logger = Logger.getInstance();
 
 	public Account(String accountNo, String password, String name) {
 		super();
@@ -20,7 +20,7 @@ public class Account implements Serializable{
 		this.accountType = AccountType.ACCOUNT_TYPE_NORMAL;
 		this.interestRate = 0;
 		this.balance = 0;
-		logger = Logger.getInstance();
+	 
 	}
 
 	public Account(String accountNo, String password, String name, int accountType, int accountRate) {
@@ -82,20 +82,20 @@ public class Account implements Serializable{
 	// -------------------------------------
 	// 입금(잔액 +=입금액)
 	public boolean deposit(int inmoney) {
-		logger.log("deposit : " + balance + " + " + inmoney);
+		//logger.log("deposit : " + balance + " + " + inmoney);
 		// 입력->계산->출력(리턴값)
 		boolean status = false; // 입금상태
 		balance += inmoney;
 		if (balance >= inmoney)// 잔액이 입금액이상
 			status = true;
 		
-		logger.log("balance : " + balance);
+		//logger.log("balance : " + balance);
 		return status;
 	}
 
 	// 출금(잔액-=출금액)
 	public boolean withdraw(int outmoney) {
-		logger.log("deposit : " + balance + " - " + outmoney);
+		//logger.log("deposit : " + balance + " - " + outmoney);
 		
 		boolean status = false; // 출금상태
 		// 잔액이 0 아니고 출금액이상
@@ -104,7 +104,7 @@ public class Account implements Serializable{
 			status = true;
 		}
 		
-		logger.log("balance : " + balance);
+		//logger.log("balance : " + balance);
 		return status;
 	}
 
@@ -113,8 +113,5 @@ public class Account implements Serializable{
 		return "Account [accountNo=" + accountNo + ", name=" + name + ", accountType=" + accountType + ", accountRate="
 				+ interestRate + ", accountStaus=" + accountStaus + ", balance=" + balance + "]";
 	}
-
-	
-	
 	
 }

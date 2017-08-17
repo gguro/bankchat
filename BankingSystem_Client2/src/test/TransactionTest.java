@@ -1,6 +1,6 @@
 package test;
 
-import core.common.Transaction;
+import common.Transaction;
 
 public class TransactionTest {
 	public static void main(String [] args) {

@@ -1,4 +1,4 @@
-package core.message;
+package message;
 
 //계좌의 내용을 담는 클래스 서버와 클라이언트간의 통신에 사용된다.
 //일반 메세지(채팅,입장)를 담는 클래스를 상속받음

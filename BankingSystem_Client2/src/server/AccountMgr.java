@@ -1,4 +1,4 @@
-package core.server;
+package server;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,9 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 
-import core.common.Account;
+import common.Account;
 import exception.BMSException;
 
 public class AccountMgr {
@@ -46,7 +45,7 @@ public class AccountMgr {
 		if(accMap.containsKey(accountNo)) {
 			accMap.remove(accountNo);
 		} else {
-			throw new BMSException("WRN : Invalid account!");
+			throw new BMSException("WRN : Invalid account! Remove failed.");
 		}
 		
 		return true;
@@ -54,7 +53,7 @@ public class AccountMgr {
 	
 	public boolean loginAccount(String accountNo, String password) throws BMSException{
 		if(!accMap.containsKey(accountNo)) {
-			throw new BMSException("WRN : Invalid account");
+			throw new BMSException("WRN : Invalid account! Login failed");
 		}
 		
 		if(accMap.get(accountNo).getPassword().equals(password)) {
@@ -66,14 +65,14 @@ public class AccountMgr {
 	
 	public boolean depositAccount(String accountNo, int amount) throws BMSException {
 		if(!accMap.containsKey(accountNo)) {
-			throw new BMSException("WRN: Invaild account!");
+			throw new BMSException("WRN: Invaild account! Deposit failed");
 		}
 		return accMap.get(accountNo).deposit(amount);
 	}
 	
 	public boolean withdrawAccount(String accountNo, int amount) throws BMSException {
 		if(!accMap.containsKey(accountNo)) {
-			throw new BMSException("WRN : Invaild account!");
+			throw new BMSException("WRN : Invaild account! Withdraw failed");
 		}
 		
 		return accMap.get(accountNo).withdraw(amount);
@@ -81,7 +80,7 @@ public class AccountMgr {
 	
 	public boolean transferAccount(String accountNo, String to, int amount) throws BMSException {
 		if(!accMap.containsKey(accountNo) || !accMap.containsKey(to)) {
-			throw new BMSException("WRN : Invalid account!");
+			throw new BMSException("WRN : Invalid account! Transfer failed");
 		}
 		
 		if(accMap.get(accountNo).getBalance() < amount) {

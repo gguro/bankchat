@@ -8,11 +8,11 @@ import java.net.Socket;
 import java.util.Iterator;
 import java.util.Vector;
 
-import core.common.Account;
-import core.common.Logger;
-import core.message.AccountMessage;
-import core.message.Message;
+import common.Account;
+import common.Logger;
 import exception.BMSException;
+import message.AccountMessage;
+import message.Message;
 
 public class Server extends Thread {
 	private Vector<ToClient> clientList = null;
@@ -135,11 +135,17 @@ public class Server extends Thread {
 		}
 		
 		public void sendFailMsg(Message msg, String message) {
+			
+			Message error = new Message("error", "", "");
+			// 오류 내역을 클라이언트에게 보냄
+			error.setValue(message);
+			
+			// 로그에 실패내역을 저장
 			try {
-				oos.writeObject(msg);
+				oos.writeObject(error);
 				oos.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (IOException e1) {
+				System.out.println(e1.getMessage());
 			}
 			
 			logger.log("ERR : " + msg.toString() + ", " + message);
@@ -200,7 +206,7 @@ public class Server extends Thread {
 					else if (order.equals("remove")) {
 						processRemoveMessage(msg);
 					}
-					else {
+					else {	
 						System.out.println("WRN : Invalid order. msg = " + msg);
 					}
  				}
@@ -229,7 +235,7 @@ public class Server extends Thread {
 			
 			msg.setMessage("join", "님 입장", userId);
 			
-			sendSuccessMsg(msg);
+			//sendSuccessMsg(msg);
 			broadcastToAllUser(msg);
 			
 		}
@@ -243,7 +249,7 @@ public class Server extends Thread {
 				msg.setMessage("join", "님 입장", userId);
 				
 				broadcastToAllUser(msg);
-				sendSuccessMsg(msg);
+				//sendSuccessMsg(msg);
 			} else {
 				AccountMessage accMsg = (AccountMessage) msg;
 				boolean result = false;
@@ -265,7 +271,7 @@ public class Server extends Thread {
 		private void processChatMessage(Message msg) {
 			msg.setMessage("chat", msg.getValue(), msg.getUserId());
 			broadcastToAllUser(msg);
-			sendSuccessMsg(msg);
+			//sendSuccessMsg(msg);
 		}
 		private void processWhisperMessage(Message msg) {
 			msg.setMessage("whisper", msg.getValue(), msg.getUserId());
@@ -300,7 +306,7 @@ public class Server extends Thread {
 			int amount = Integer.parseInt(msg.getValue());
 			boolean result;
 			try {
-				result = serverMgr.deposit(accMsg.getId(), amount);
+				result = serverMgr.deposit(accMsg.getUserId(), amount);
 				if(result == true) {
 					sendSuccessMsg(accMsg);
 				} else {
@@ -318,7 +324,7 @@ public class Server extends Thread {
 			boolean result;
 			
 			try {
-				result = serverMgr.withdraw(accMsg.getId(), amount);
+				result = serverMgr.withdraw(accMsg.getUserId(), amount);
 				if(result == true) {
 					sendSuccessMsg(accMsg);
 				} else {
@@ -335,7 +341,7 @@ public class Server extends Thread {
 			int amount = Integer.parseInt(accMsg.getValue());
 			boolean result;
 			try {
-				result = serverMgr.transfer(accMsg.getId(), to, amount);
+				result = serverMgr.transfer(accMsg.getUserId(), to, amount);
 				if(result == true) {
 					sendSuccessMsg(accMsg);
 				} else {
@@ -353,7 +359,7 @@ public class Server extends Thread {
 			int amount = Integer.parseInt(accMsg.getValue());
 			boolean result;
 			try {
-				result = serverMgr.transfer(accMsg.getId(), to, amount);
+				result = serverMgr.transfer(accMsg.getUserId(), to, amount);
 				if(result == true) {
 					sendSuccessMsg(accMsg);
 				} else {
