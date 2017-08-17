@@ -3,13 +3,18 @@ package server;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
+
+import javax.swing.table.DefaultTableModel;
 
 import common.Account;
 import common.Logger;
 import common.Transaction;
 import dialog.ServerFrame2;
 import exception.BMSException;
+import server.Server.ToClient;
 
 public class ServerMgr {
 	ServerProperties props;
@@ -78,7 +83,6 @@ public class ServerMgr {
 		logger.log(">> 계좌 생성 : " + account.getAccountNo() +", " + account.getName());
 		transMgr.createTrans(account.getAccountNo());
 		
-		
 		return accMgr.addAccount(account);
 
 	}
@@ -87,6 +91,9 @@ public class ServerMgr {
 		return accMgr.getAccount(accountNo);
 	}
 	
+	public List<Account> getAccountAll() {
+		return accMgr.getAllAccounts();
+	}
 	
 	public boolean withdraw(String accountNo, int amount) throws BMSException {
 		logger.log(">> 출금 : " + accountNo + ", " + amount);
@@ -145,11 +152,11 @@ public class ServerMgr {
 		}
 		
 	}
-	
+
 	public List<Transaction> getTransaction(String account) throws BMSException {
 		return transMgr.getList(account);
 	}
-
+	
 	public Server getServer() {
 		// TODO Auto-generated method stub
 		return server;
@@ -158,5 +165,25 @@ public class ServerMgr {
 	
 	public ServerFrame2 getFrame() {
 		return sf2;
+	}
+
+	// 접속리스트
+	public void getLoginList() {
+		Vector<ToClient> clientList = server.getClientList();
+		Iterator<ToClient> iterator = clientList.iterator();
+		Vector<String> tableRow = null;
+		DefaultTableModel model = sf2.getModel();
+
+		model.setNumRows(0);
+		while (iterator.hasNext()) {
+			ToClient temp = iterator.next();
+
+			tableRow = new Vector<String>();
+			tableRow.addElement(temp.getUserId());
+			tableRow.addElement("online");
+			
+			model.addRow(tableRow);
+			sf2.setModel(model);
+		}
 	}
 }

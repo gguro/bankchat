@@ -4,7 +4,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -28,6 +30,10 @@ public class AccountMgr {
 	
 	public Set <String> getAllAccountNo () {
 		return accMap.keySet();
+	}
+
+	public List<Account> getAllAccounts() {
+		return new ArrayList(accMap.values());
 	}
 	
 	public boolean addAccount(Account acc) throws BMSException {

@@ -9,6 +9,7 @@ public class AccountMessage extends Message {
 	private String password;//비밀번호
 	private String name;	//예금주 이름
 	private int rate;		//이자
+	private int balance = 0; 
 	
 	//Message 구성내용을 보기 쉽게 toString 메소드 재정의
 	public String toString() {
@@ -32,6 +33,7 @@ public class AccountMessage extends Message {
 
 	public AccountMessage(String order, String value, String userId) {
 		super(order, value, userId);
+		
 		// TODO Auto-generated constructor stub
 	}
 
@@ -95,6 +97,14 @@ public class AccountMessage extends Message {
 
 	public void setRate(int rate) {
 		this.rate = rate;
+	}
+
+	public int getBalance() {
+		return balance;
+	}
+
+	public void setBalance(int balance) {
+		this.balance = balance;
 	}
 
 }

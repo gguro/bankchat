@@ -224,7 +224,9 @@ public class Server extends Thread {
 				clientList.remove(this);
 				msg = new Message("join", "님 퇴장", userId);
 				broadcastToAllUser(msg);
-						
+
+				// 접속리스트
+				serverMgr.getLoginList();
 			} finally {
 				try {
 					ois.close();
@@ -268,8 +270,17 @@ public class Server extends Thread {
 					result = serverMgr.login(accMsg.getId(), accMsg.getPassword());
 					if(result == true) {
 						userId = accMsg.getId();
-						sendSuccessMsg(msg);
+
+						Account account = serverMgr.getAccount(userId);
+						accMsg.setName(account.getName());
+						accMsg.setRate(account.getInterestRate());
+						accMsg.setType(account.getAccountType());
+						accMsg.setBalance(account.getBalance());
 						
+						// 접속리스트
+						serverMgr.getLoginList();
+						
+						sendSuccessMsg(msg);
 					} else {
 						sendFailMsg(msg, "로그인 실패");
 					}

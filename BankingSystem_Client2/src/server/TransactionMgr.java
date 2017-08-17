@@ -23,6 +23,8 @@ public class TransactionMgr {
 		loadTransactionInfo();
 	}
 	
+	
+	
 //	public TransactionMgr() {
 //		transMap = new HashMap<String, List<Transaction>>();
 //		

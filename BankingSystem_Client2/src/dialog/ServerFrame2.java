@@ -9,11 +9,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -24,39 +27,50 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import common.Account;
+import common.Transaction;
+import exception.BMSException;
 import message.Message;
 import server.ServerMgr;
+import server.Server.ToClient;
 
 public class ServerFrame2 extends JFrame {
 
 	private JPanel contentPane;
 	private JTable table;
-	DefaultTableModel model;
-	Vector<String> tableIndex = new Vector<String>();
-
+	private DefaultTableModel lmodel;
+	private Vector<String> lIndex = new Vector<String>();
+	private String id;
+	
 	private JTextField accName;
 	private JTextField accId;
 	private JTextField balance;
 	private JTextField accType;
 	private JTextField rate;
 
-	JLabel accNamelbl;
-	JLabel accIdlbl;
-	JLabel balancelbl;
-	JLabel accTypelbl;
-	JLabel ratelbl;
+	private JLabel accNamelbl;
+	private JLabel accIdlbl;
+	private JLabel balancelbl;
+	private JLabel accTypelbl;
+	private JLabel ratelbl;
 
-	JTextField input;
-	JTextArea chat;
-	JScrollPane jsp;
-	JScrollBar jsb;
+	private JTextField input;
+	private JTextArea chat;
+	private JScrollPane jsp;
+	private JScrollBar jsb;
 
-	JButton btnNewButton;
+	private JButton serverStart;
+	private JButton btnNewButton;
+	private JButton getOutBtn;
+
+	private JTable transactionTable;
+	private DefaultTableModel tmodel;
+	private Vector<String> tIndex = new Vector<String>();
+	private JButton searchAcc;
 
 	//// private ArrayList<Log> logs;
 	//// private AccountMgr mgr;
 	ServerFrame2 serverFrame2;
-	private JTable transactionTable;
+
 	ServerMgr serverMgr;
 
 	public ServerFrame2(String title) {
@@ -64,7 +78,7 @@ public class ServerFrame2 extends JFrame {
 
 		init();
 		start();
-		setBounds(100, 100, 811, 619);
+		setBounds(100, 100, 823, 630);
 		setTitle(title);
 		setVisible(true);
 	}
@@ -73,7 +87,6 @@ public class ServerFrame2 extends JFrame {
 	 * Create the frame.
 	 */
 	public void init() {
-
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -87,15 +100,15 @@ public class ServerFrame2 extends JFrame {
 		scrollPane.setBounds(17, 96, 190, 213);
 		contentPane.add(scrollPane);
 
-		tableIndex.addElement("ID");
-		tableIndex.addElement("Status");
-		model = new DefaultTableModel(tableIndex, 0) {
+		lIndex.addElement("ID");
+		lIndex.addElement("Status");
+		setModel(new DefaultTableModel(lIndex, 0) {
 			public boolean isCellEditable(int i, int c) {
 				return false;
 			}
-		};
+		});
 
-		table = new JTable(model);
+		table = new JTable(getModel());
 		scrollPane.setViewportView(table);
 
 		table.addMouseListener(new MouseEventListener());
@@ -164,7 +177,19 @@ public class ServerFrame2 extends JFrame {
 		contentPane.add(scrollPane_1);
 
 		// 거래내역
-		transactionTable = new JTable();
+		tIndex.addElement("계좌번호");
+		tIndex.addElement("from");
+		tIndex.addElement("to");
+		tIndex.addElement("amount");
+		tIndex.addElement("날짜");
+		tIndex.addElement("시간");
+		setTModel(new DefaultTableModel(tIndex, 0) {
+			public boolean isCellEditable(int i, int c) {
+				return false;
+			}
+		});
+
+		transactionTable = new JTable(getTModel());
 		scrollPane_1.setViewportView(transactionTable);
 
 		chat = new JTextArea();
@@ -193,46 +218,39 @@ public class ServerFrame2 extends JFrame {
 		JLabel label_8 = new JLabel("거래내역"); // transaction list
 		label_8.setBounds(229, 162, 61, 16);
 		contentPane.add(label_8);
+		
+		serverStart = new JButton("서버켜기"); // server start
+		serverStart.addActionListener(new buttonHanlder());
+		serverStart.setBounds(16, 21, 117, 29);
+		contentPane.add(serverStart);
 
-		JButton button = new JButton("서버켜기"); // server start
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				serverMgr = new ServerMgr(serverFrame2);
-				// mgr = new AccountMgr(serverFrame2);
-				// mgr.accountsLoad();
-				addText("서버시작\n");
-				chat.append("<<클라이언트에게 귓속말 하는 방법>>\t/msg 아이디 채팅내용\n");
-
-				serverMgr.startServer();
-				btnNewButton.setEnabled(true);
-				button.setEnabled(false);
-			}
-		});
-		button.setBounds(16, 21, 117, 29);
-		contentPane.add(button);
-
+		// 계좌검색
+		searchAcc = new JButton("\uACC4\uC88C\uAC80\uC0C9");
+		searchAcc.setBounds(145, 21, 117, 29);
+		contentPane.add(searchAcc);
+		searchAcc.addActionListener(new buttonHanlder());
+		
+		// 전체계좌정보
 		btnNewButton = new JButton("전체계좌정보"); // all account info
-		btnNewButton.setBounds(147, 21, 117, 29);
+		btnNewButton.setBounds(274, 21, 117, 29);
 		contentPane.add(btnNewButton);
-
+		btnNewButton.addActionListener(new buttonHanlder());
+		
 		// 강제퇴장
-		// JButton getOutBtn = new JButton("\uAC15\uC81C\uD1F4\uC7A5");
-		// getOutBtn.setBounds(694, 129, 97, 23);
-		// contentPane.add(getOutBtn);
-		// getOutBtn.addActionListener(new ActionListener() {
-		//
-		// @Override
-		// public void actionPerformed(ActionEvent e) {
-		// System.out.println("퇴장");
-		//// mgr.getServer().getClientSocket().r
-		// }
-		// });
+		getOutBtn = new JButton("\uAC15\uC81C\uD1F4\uC7A5");
+		getOutBtn.setBounds(694, 129, 97, 23);
+		contentPane.add(getOutBtn);
+		
+		getOutBtn.setVisible(false);
+		getOutBtn.addActionListener(new buttonHanlder());
 	}
 
 	public void start() {
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				serverMgr.shutDown();
+				if (serverMgr != null) {
+					serverMgr.shutDown();
+				}
 				System.exit(0);// cierra aplicacion
 			}
 		});
@@ -272,6 +290,22 @@ public class ServerFrame2 extends JFrame {
 		new ServerFrame2("서버");
 	}
 
+	public DefaultTableModel getModel() {
+		return lmodel;
+	}
+
+	public void setModel(DefaultTableModel model) {
+		this.lmodel = model;
+	}
+
+	public DefaultTableModel getTModel() {
+		return tmodel;
+	}
+
+	public void setTModel(DefaultTableModel model) {
+		this.tmodel = model;
+	}
+	
 	class MessageSendListener extends KeyAdapter {
 		// 키보드의 특정 키 누르는 경우 호출
 		@Override
@@ -281,9 +315,6 @@ public class ServerFrame2 extends JFrame {
 			if (e.getKeyCode() == KeyEvent.VK_ENTER && !(input.getText()).equals("")) {
 				// '/msg'로 시작 -> 귓속말 할때
 				if (input.getText().startsWith("/msg")) {
-					
-					
-					
 					// //받는사람
 					// String toId = input.getText().split("/msg")[1].trim();
 					// //받은 텍스트
@@ -331,20 +362,103 @@ public class ServerFrame2 extends JFrame {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (e.getButton() == 1) {
+				// 서버 메인화면 우측상단 데이터 리프레쉬
+				// 회원정보
 				int row = table.getSelectedRow();
-				System.out.println("Table Click : " + row);
-				System.out.println(model.getDataVector().get(row));
-				// list value
-				String id = model.getValueAt(row, 0).toString();
-				String stat = model.getValueAt(row, 1).toString();
+				System.out.println(lmodel.getDataVector().get(row));
+
+				id = lmodel.getValueAt(row,0).toString();
 
 				Account acc = serverMgr.getAccount(id);// mgr.findbyId(id);
+
+				// list value
 				accName.setText(acc.getName());
 				accId.setText(acc.getAccountNo());
-				balance.setText(((Integer) acc.getBalance()).toString());
+				balance.setText(((Integer)acc.getBalance()).toString());
 
+				String type;
+				if (acc.getAccountType() == 1) {
+					type = "일반";
+				} else if (acc.getAccountType() == 2) {
+					type = "보통";
+				} else {
+					type = "";
+				}
+				accType.setText(type);
+				rate.setText(((Integer)acc.getInterestRate()).toString());
+
+				// 강제퇴장버튼 활성화
+				getOutBtn.setVisible(true);
+				
+				// 거래내역
+				try {
+					List<Transaction> list = serverMgr.getTransaction(acc.getAccountNo());
+					
+					Vector<String> tableRow = null;
+					DefaultTableModel temp = getTModel();
+
+					temp.setNumRows(0);
+					for (Transaction transaction : list) {
+						tableRow = new Vector<String>();
+						tableRow.addElement(transaction.getAccountNo());
+						tableRow.addElement(transaction.getFrom());
+						tableRow.addElement(transaction.getTo());
+						tableRow.addElement(((Integer)transaction.getAmount()).toString());
+						tableRow.addElement(transaction.getDate().toString());
+						tableRow.addElement(transaction.getTime().toString());
+
+						temp.addRow(tableRow);
+						setTModel(temp);
+					}
+				} catch (BMSException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 			}
 		}
 	}
 
+	// 버튼이 눌렸을때 동작 정의
+	private class buttonHanlder implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			// 서버시작
+			if (e.getActionCommand().equals(serverStart.getText())) {
+				serverMgr = new ServerMgr(serverFrame2);
+				addText("서버시작\n");
+				chat.append("<<클라이언트에게 귓속말 하는 방법>>\t/msg 아이디 채팅내용\n");
+
+				serverMgr.startServer();
+				btnNewButton.setEnabled(true);
+				serverStart.setEnabled(false);
+			} else if (e.getActionCommand().equals(getOutBtn.getText())) {
+				//강제퇴장
+				//클라이언트들을 하나씩 비교하면서 이름이 같은것이 있나 확인
+				for (int i = 0; i < serverMgr.getServer().getClientList().size(); i++) {
+					//이름이 같은 클라이언트를 발견하면 강퇴메시지를 보냄
+					//id = 리스트클릭하여 선택된 아이디정보(클릭이벤트시 아이디 받아온다)
+					if (serverMgr.getServer().getClientList().get(i).getUserId().equals(id)) {
+						Message msg = new Message("ban", "", "");
+						serverMgr.getServer().getClientList().get(i).sendPrivate(msg);
+					}
+				}
+			} else if (e.getActionCommand().equals(searchAcc.getText())) {
+				//계좌검색
+				new ServerAccountFrame(serverMgr);
+			} else if (e.getActionCommand().equals(btnNewButton.getText())) {
+				//전체계좌정보
+				List<Account> acc = serverMgr.getAccountAll();
+				
+				if (acc.size() < 1)
+					JOptionPane.showMessageDialog(null, "계좌 정보가 없습니다.");
+				else
+					new ServerAllAccountFrame(acc);
+			}
+		}
+	}
+	
+	
 }
