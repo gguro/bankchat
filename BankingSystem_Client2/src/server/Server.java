@@ -6,13 +6,16 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import common.Account;
 import common.Logger;
+import common.Transaction;
 import exception.BMSException;
 import message.AccountMessage;
 import message.Message;
+import message.TransactionMessage;
 
 public class Server extends Thread {
 	private Vector<ToClient> clientList = null;
@@ -209,6 +212,9 @@ public class Server extends Thread {
 					else if (order.equals("remove")) {
 						processRemoveMessage(msg);
 					}
+					else if (order.equals("transaction")) {
+						processTransactionMessage(msg);
+					}
 					else {	
 						System.out.println("WRN : Invalid order. msg = " + msg);
 					}
@@ -252,6 +258,7 @@ public class Server extends Thread {
 				msg.setMessage("join", "님 입장", userId);
 				
 				broadcastToAllUser(msg);
+				
 				//sendSuccessMsg(msg);
 			} else {
 				AccountMessage accMsg = (AccountMessage) msg;
@@ -260,7 +267,9 @@ public class Server extends Thread {
 				try {
 					result = serverMgr.login(accMsg.getId(), accMsg.getPassword());
 					if(result == true) {
+						userId = accMsg.getId();
 						sendSuccessMsg(msg);
+						
 					} else {
 						sendFailMsg(msg, "로그인 실패");
 					}
@@ -371,6 +380,22 @@ public class Server extends Thread {
 			} catch (BMSException e) {
 				// TODO Auto-generated catch block
 				sendFailMsg(accMsg, e.getMessage());
+			}
+		}
+		
+		private void processTransactionMessage(Message msg) {
+			
+			try {
+				String accountNo = msg.getUserId();
+				
+				List<Transaction> list = serverMgr.getTransaction(accountNo);
+				
+				if(list != null) {
+					TransactionMessage tMsg = new TransactionMessage(accountNo, list.size(), list);
+					sendPrivate(tMsg);
+				}
+			} catch (BMSException e) {
+				sendFailMsg(msg, e.getMessage());
 			}
 		}
 		

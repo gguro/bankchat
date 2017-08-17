@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import common.Transaction;
+import exception.BMSException;
 
 public class TransactionMgr {
 	private Map<String, List<Transaction>> transMap;
@@ -133,7 +134,10 @@ public class TransactionMgr {
 		return transMap.keySet();
 	}
 	
-	public List<Transaction> getList(String accountNo) {
+	public List<Transaction> getList(String accountNo) throws BMSException {
+		if(!transMap.containsKey(accountNo)) {
+			throw new BMSException("WRN : Invalid account! Get list failed");
+		}
 		
 		return transMap.get(accountNo);
 	}

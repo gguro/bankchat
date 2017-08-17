@@ -10,7 +10,7 @@ public class Account implements Serializable{
 	private int interestRate;
 	private int accountStaus;
 	private int balance;
-	private Logger logger = Logger.getInstance();
+	
 
 	public Account(String accountNo, String password, String name) {
 		super();

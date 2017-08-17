@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import common.Transaction;
+import exception.BMSException;
 import server.ServerProperties;
 import server.TransactionMgr;
 
@@ -20,12 +21,19 @@ public class TransactionManagerTest {
 		
 		for(String acc : accountList) {
 			System.out.println(">> AccountNo : " + acc);
-			List<Transaction> tl = tmgr.getList(acc);
-			for(Transaction ts : tl) {
-				System.out.println(ts.toString());
+			List<Transaction> tl;
+			
+			try {
+				tl = tmgr.getList(acc);
+				for(Transaction ts : tl) {
+					System.out.println(ts.toString());
+				}
+				
+			} catch (BMSException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
-		
 		
 		//System.out.println(tmgr.getList());
 		String accountNo = "22222222";

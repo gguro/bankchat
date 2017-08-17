@@ -124,6 +124,13 @@ public class AccountMgr {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "AccountMgr [accMap=" + accMap + "]";
+	}
+	
+	
+
 	/*
 	public boolean saveAccountInfo() {
 		System.out.println("-- Account 정보 저장 ");

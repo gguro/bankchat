@@ -3,6 +3,7 @@ package server;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 
 import common.Account;
 import common.Logger;
@@ -141,6 +142,10 @@ public class ServerMgr {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public List<Transaction> getTransaction(String account) throws BMSException {
+		return transMgr.getList(account);
 	}
 
 	public Server getServer() {
