@@ -1,30 +1,34 @@
 package client;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.List;
+import java.net.UnknownHostException;
 
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 
-import common.Transaction;
 import message.AccountMessage;
 import message.Message;
-import message.TransactionMessage;
+
 //서버와의 연결을 담당하는 클라이언트, 소켓과 스트림을 갖는다.
 public class Client {
 	private Socket clientSocket; // 클라이언트
 	private ObjectInputStream ois; // object를 받는 변수
 	private ObjectOutputStream oos; // object를 보내는 변수
-	private ClientFrame frame; // 클라이언트 프레임을 받음
+	private ClientFrame2 frame; // 클라이언트 프레임을 받음
 	private String id; // 각 클라이언트 ID
 
-	public Client(ClientFrame frame) {
+	public Client(ClientFrame2 frame) {
 		this.frame = frame;
 		try {
 			// 통신소켓(전화기) 입출력 문자스트림(전화선) 생성
@@ -66,14 +70,25 @@ public class Client {
 			sendMSG(msg);
 			// 서버에서 처리 후 다시 각 클라이언트에게 보낸 것을 받음
 			try {
+				System.out.println("run");
 				// 서버에서 온메시지를 열어 ID에 저장
 				msg = (Message) ois.readObject();
+				System.out.println(msg);
 				id = msg.getUserId();
 			} catch (ClassNotFoundException e1) {
 				e1.printStackTrace();
 			} catch (IOException e1) {
 				e1.printStackTrace();
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
+			frame.create.setEnabled(true);
+			frame.login.setEnabled(true);
+			frame.close.setEnabled(false);
+			frame.deposit.setEnabled(false);
+			frame.widthraw.setEnabled(false);
+			frame.send.setEnabled(false);
+			frame.print.setEnabled(false);
 			while (true) {
 				try {
 					// 서버의 메시지를 계속 받는다.
@@ -92,17 +107,6 @@ public class Client {
 								msg = new Message("whisper", str, getClientId());
 								sendMSG(msg);
 							}
-						}
-						else if (msg.getOrder().equals("transaction")) {
-							JOptionPane.showMessageDialog(null, "거래내역");
-							TransactionMessage tMsg = (TransactionMessage) msg;
-							
-							int totalCount = tMsg.getTotalCount();
-							List<Transaction> list = tMsg.getList();
-							
-							System.out.println("Count = " + totalCount);
-							System.out.println("list.size() = " + list.size());
-							/////////////////////
 						}
 						// 서버에서 보낸 메시지가 에러일때 화면에 뿌려줌
 						else if (msg.getOrder().equals("error")) {
@@ -133,16 +137,19 @@ public class Client {
 											int fdata = -1;
 											//받으려는 파일의 크기를 받아옴
 											int max = in.readInt();
+											
+											
+										
 											// 파일 끝까지 읽어오기
-											while ((fdata = in.read()) != -1) {
-												fot.write(fdata);
-												fot.flush();
-												//다운로드 상태바에 현재 상태 표시
-												frame.jpb.setValue((int) (file.length() * 100 / max));
-											}
-											// 파일이 완료 됐다면 화면에 출력
-											JOptionPane.showMessageDialog(frame, "파일받아오기 성공");
-											frame.jpb.setValue(0);
+//											while ((fdata = in.read()) != -1) {
+//												fot.write(fdata);
+//												fot.flush();
+//												//다운로드 상태바에 현재 상태 표시
+//												frame.jpb.setValue((int) (file.length() * 100 / max));
+//											}
+//											// 파일이 완료 됐다면 화면에 출력
+//											JOptionPane.showMessageDialog(frame, "파일받아오기 성공");
+//											frame.jpb.setValue(0);
 										} catch (Exception e) {
 											e.printStackTrace();
 										} finally {
@@ -168,20 +175,50 @@ public class Client {
 							if (msg.getOrder().equals("login")) {
 								AccountMessage accMsg = (AccountMessage) msg;
 								id = accMsg.getId();
-								for (int i = 0; i < frame.btn2.length; i++) {
-									frame.btn2[i].setEnabled(true);
+								
+					            frame.create.setEnabled(true);
+								frame.login.setEnabled(false);
+								frame.close.setEnabled(true);
+								frame.deposit.setEnabled(true);
+								frame.widthraw.setEnabled(true);
+								frame.send.setEnabled(true);
+								frame.print.setEnabled(true);
+								frame.connect.setEnabled(false);	// 계좌해지일때, 버튼 활성화 및 비활성화
+								
+								frame.accName.setText(accMsg.getName());
+								frame.accId.setText(accMsg.getId());
+								String type = "";
+								if(accMsg.getType()==1) {
+									type="일반계좌";								}
+								else if(accMsg.getType()==2) {
+									type="보통계좌";
 								}
-								frame.btn1[1].setEnabled(true);
-								frame.btn1[2].setEnabled(false);
-								// 계좌해지일때, 버튼 활성화 및 비활성화
-							} else if (msg.getOrder().equals("close")) {
-								for (int i = 0; i < frame.btn2.length; i++) {
-									if (i != 0)
-										frame.btn2[i].setEnabled(false);
-								}
-								frame.btn1[1].setEnabled(false);
-								frame.btn1[2].setEnabled(true);
+								frame.accType.setText(type);
+								
+								frame.balance.setText(((Integer)accMsg.getBalance()).toString());
+								frame.rate.setText(((Integer)accMsg.getRate()).toString());
+								
+								
+							} else if (msg.getOrder().equals("remove")) {
+								
+								 frame.create.setEnabled(true);
+								 frame.login.setEnabled(true);
+								 frame.close.setEnabled(false);
+								 frame.deposit.setEnabled(false);
+								 frame.widthraw.setEnabled(false);
+								 frame.send.setEnabled(false);
+								 frame.print.setEnabled(false);
+							
 							}
+							else if (msg.getOrder().equals("deposit") 
+									||(msg.getOrder().equals("withdraw"))
+									||(msg.getOrder().equals("send"))) {
+								AccountMessage accMsg = (AccountMessage) msg;
+								frame.balance.setText(""+accMsg.getBalance());
+							
+							}
+							
+							
 							JOptionPane.showMessageDialog(frame, msg.getOrder() + "성공");
 						}
 
