@@ -367,11 +367,10 @@ public class Server extends Thread {
 		}
 		private void processRemoveMessage(Message msg) {
 			AccountMessage accMsg = (AccountMessage) msg;
-			String to = accMsg.getTo();
-			int amount = Integer.parseInt(accMsg.getValue());
+
 			boolean result;
 			try {
-				result = serverMgr.transfer(accMsg.getUserId(), to, amount);
+				result = serverMgr.remove(accMsg.getUserId());
 				if(result == true) {
 					sendSuccessMsg(accMsg);
 				} else {
@@ -393,6 +392,7 @@ public class Server extends Thread {
 				if(list != null) {
 					TransactionMessage tMsg = new TransactionMessage(accountNo, list.size(), list);
 					tMsg.setOrder("transaction");
+					tMsg.setUserId(accountNo);
 					sendPrivate(tMsg);
 				}
 			} catch (BMSException e) {

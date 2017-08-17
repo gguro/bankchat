@@ -135,6 +135,7 @@ public class TransactionMgr {
 	}
 	
 	public List<Transaction> getList(String accountNo) throws BMSException {
+		
 		if(!transMap.containsKey(accountNo)) {
 			throw new BMSException("WRN : Invalid account! Get list failed");
 		}
@@ -147,14 +148,21 @@ public class TransactionMgr {
 		return true;
 	}
 	
-	public boolean addTrans(String accountNo, Transaction trans) {
+	public boolean createTrans(String accountNo) {
+		if(transMap.containsKey(accountNo)) {
+			System.out.println("WRN : 거래내역이 이미 있습니다. 기존 거래내역은 삭제됩니다.");
+		}
+
+		transMap.put(accountNo, new ArrayList<Transaction> ());
+		return true;
+	}
+	
+	public boolean addTrans(String accountNo, Transaction trans) throws BMSException {
 		
 		if(transMap.containsKey(accountNo)) {
 			transMap.get(accountNo).add(trans);
 		} else {
-			List<Transaction> tList = new ArrayList<Transaction> ();
-			transMap.put(accountNo, tList);
-			transMap.get(accountNo).add(trans);
+			throw new BMSException("WRN : Invalid account! 거래내역 추가 실패");
 		}
 		
 		return true;

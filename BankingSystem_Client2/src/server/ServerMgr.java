@@ -76,6 +76,8 @@ public class ServerMgr {
 	
 	public boolean create(Account account) throws BMSException {
 		logger.log(">> °èÁÂ »ı¼º : " + account.getAccountNo() +", " + account.getName());
+		transMgr.createTrans(account.getAccountNo());
+		
 		
 		return accMgr.addAccount(account);
 

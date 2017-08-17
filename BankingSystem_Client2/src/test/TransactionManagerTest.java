@@ -38,11 +38,20 @@ public class TransactionManagerTest {
 		//System.out.println(tmgr.getList());
 		String accountNo = "22222222";
 		
-		Transaction trans = new Transaction(accountNo, "",  accountNo, 100);
-		tmgr.addTrans(accountNo, trans);
-		trans = new Transaction(accountNo, "", accountNo, 200);
-		tmgr.addTrans(accountNo, trans);
+		Transaction trans;
+		try {
+			trans = new Transaction(accountNo, "",  accountNo, 100);
+			tmgr.addTrans(accountNo, trans);
+			trans = new Transaction(accountNo, "", accountNo, 200);
+			tmgr.addTrans(accountNo, trans);
+			
+		} catch (BMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		tmgr.saveTransactionInfo();
+		
 		
 	}
 }
