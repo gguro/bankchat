@@ -331,6 +331,9 @@ public class Server extends Thread {
 			try {
 				result = serverMgr.deposit(accMsg.getUserId(), amount);
 				if(result == true) {
+					Account account = serverMgr.getAccount(accMsg.getUserId());
+					accMsg.setBalance(account.getBalance());
+					
 					sendSuccessMsg(accMsg);
 				} else {
 					sendFailMsg(accMsg, "입금 실패");
@@ -349,6 +352,9 @@ public class Server extends Thread {
 			try {
 				result = serverMgr.withdraw(accMsg.getUserId(), amount);
 				if(result == true) {
+					Account account = serverMgr.getAccount(accMsg.getUserId());
+					accMsg.setBalance(account.getBalance());
+					
 					sendSuccessMsg(accMsg);
 				} else {
 					sendFailMsg(accMsg, "출금 실패");
@@ -366,6 +372,10 @@ public class Server extends Thread {
 			try {
 				result = serverMgr.transfer(accMsg.getUserId(), to, amount);
 				if(result == true) {
+					Account account = serverMgr.getAccount(accMsg.getUserId());
+					accMsg.setBalance(account.getBalance());
+					
+					
 					sendSuccessMsg(accMsg);
 				} else {
 					sendFailMsg(accMsg, "이체 실패");
