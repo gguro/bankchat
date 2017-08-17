@@ -109,6 +109,9 @@ public class Server extends Thread {
 				break;
 			}
 		}
+		
+		serverMgr.getFrame().addText("[庇加富:穿备穿备] : " + msg.getValue() + "\n");
+		
 	}
 	
 	public class ToClient extends Thread{

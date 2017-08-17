@@ -281,6 +281,9 @@ public class ServerFrame2 extends JFrame {
 			if (e.getKeyCode() == KeyEvent.VK_ENTER && !(input.getText()).equals("")) {
 				// '/msg'로 시작 -> 귓속말 할때
 				if (input.getText().startsWith("/msg")) {
+					
+					
+					
 					// //받는사람
 					// String toId = input.getText().split("/msg")[1].trim();
 					// //받은 텍스트
@@ -305,6 +308,13 @@ public class ServerFrame2 extends JFrame {
 					// mgr.getServer().getClientSocket().get(i).sendPrivate(msg);
 					// }
 					// }
+					
+					// /msg 1111 안녕.
+					
+					Message msg = new Message("whisper", input.getText(), "운영자");
+					String userId = "1111";
+					serverMgr.getServer().sendTragetUser("1111" , msg);
+					input.setText("");
 				} else {
 					// 클라이언트 입력 메세지를 서버에 전송
 					Message msg = new Message("chat", input.getText(), "운영자");
