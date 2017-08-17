@@ -112,9 +112,6 @@ public class Server extends Thread {
 				break;
 			}
 		}
-		
-		serverMgr.getFrame().addText("[庇加富:穿备穿备] : " + msg.getValue() + "\n");
-		
 	}
 	
 	public class ToClient extends Thread{
@@ -297,9 +294,8 @@ public class Server extends Thread {
 			//sendSuccessMsg(msg);
 		}
 		private void processWhisperMessage(Message msg) {
-			msg.setMessage("whisper", msg.getValue(), msg.getUserId());
-			sendTragetUser(msg.getUserId(), msg);
-			System.out.println("庇加富 贸府 眠啊");
+			System.out.println("recv : " + msg.getValue());
+			serverMgr.getFrame().addText("[庇加富(" + msg.getUserId() +")] : "+ msg.getValue());
 		}
 		private void processCreateMessage(Message msg) {
 			AccountMessage accMsg = (AccountMessage) msg;

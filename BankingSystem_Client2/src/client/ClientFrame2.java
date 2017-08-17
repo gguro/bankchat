@@ -21,6 +21,7 @@ import java.awt.Color;
 import javax.swing.border.TitledBorder;
 
 import message.AccountMessage;
+import message.Message;
 
 public class ClientFrame2 extends JFrame {
 	JTextArea chat;
@@ -45,6 +46,8 @@ public class ClientFrame2 extends JFrame {
 	JLabel balancelbl;
 	JLabel accTypelbl;
 	JLabel ratelbl;
+
+	JScrollPane jsp;
 
 	private Client client;
 	ClientFrame2 cf;
@@ -98,14 +101,15 @@ public class ClientFrame2 extends JFrame {
 		getContentPane().add(print);
 		print.addActionListener(new buttonHanlder());
 
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(20, 300, 550, 250);
-		getContentPane().add(scrollPane);
-
 		chat = new JTextArea();
-		scrollPane.setViewportView(chat);
+		jsp = new JScrollPane(chat);
+		jsp.setBounds(20, 300, 550, 250);
+		getContentPane().add(jsp);
+		chat.setEditable(false);
+		jsp.setViewportView(chat);
 		
 		input = new JTextField();
+		input.addKeyListener(new MessageSendListener());
 		input.setBounds(20, 575, 550, 25);
 		getContentPane().add(input);
 		input.setColumns(10);
@@ -221,6 +225,31 @@ public class ClientFrame2 extends JFrame {
 
 	}
 
+	class MessageSendListener extends KeyAdapter {
+		// 키보드의 특정 키 누르는 경우 호출
+		@Override
+		public void keyPressed(KeyEvent e) {
+
+			// 누른 키가 ENTER이고 빈메세지 아니면
+			if (e.getKeyCode() == KeyEvent.VK_ENTER && !(input.getText()).equals("")) {
+				// '/msg'로 시작 -> 귓속말 할때
+				if (input.getText().startsWith("/msg")) {
+					String text = input.getText().split("/msg ")[1].trim();
+					Message msg = new Message("whisper", text, client.getClientId()); 
+
+					chat.append("운영자 에게 보내는 메시지>> "+ text + "\n");
+					client.sendMSG(msg);
+					input.setText("");
+					
+				} else {
+					// 클라이언트 입력 메세지를 서버 전송
+					Message msg = new Message("chat", input.getText(), client.getClientId());
+					client.sendMSG(msg);
+					input.setText("");
+				}
+			}
+		}
+	}
 	private class buttonHanlder implements ActionListener {
 
 		@Override

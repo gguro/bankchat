@@ -339,13 +339,27 @@ public class ServerFrame2 extends JFrame {
 					// mgr.getServer().getClientSocket().get(i).sendPrivate(msg);
 					// }
 					// }
-					
-					// /msg 1111 안녕.
-					
-					Message msg = new Message("whisper", input.getText(), "운영자");
-					String userId = "1111";
-					serverMgr.getServer().sendTragetUser("1111" , msg);
+
+					String toId = input.getText().split("/msg ")[1].trim();
+					String text = "";
+
+					int index = 0;
+					for (int i = 0; i < toId.length(); i++) {
+						if (toId.charAt(i) == ' ') {
+							index = i;
+							break;
+						}
+					}
+					// 받는사람과 텍스트를 구분지어 클라이언트에게 메시지 전송
+					text = toId.substring(index, toId.length());
+					toId = toId.substring(0, index);
+
+					Message msg = new Message("whisper", text, "운영자"); 
+
+					serverMgr.getFrame().addText(toId +"에게 보내는 메시지>> "+  msg.getValue() + "\n");
+					serverMgr.getServer().sendTragetUser(toId, msg);					
 					input.setText("");
+
 				} else {
 					// 클라이언트 입력 메세지를 서버에 전송
 					Message msg = new Message("chat", input.getText(), "운영자");

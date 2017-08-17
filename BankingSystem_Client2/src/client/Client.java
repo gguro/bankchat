@@ -101,11 +101,11 @@ public class Client {
 							else
 								frame.chat.append(msg.getUserId() + " " + msg.getValue() + "\n");
 						} else if (msg.getOrder().equals("whisper")) {
-							String str = JOptionPane.showInputDialog(null, msg.getValue(), msg.getUserId(),
-									JOptionPane.INFORMATION_MESSAGE);
-							if (str != null && str.length() > 0) {
-								msg = new Message("whisper", str, getClientId());
-								sendMSG(msg);
+							
+							if (msg.getOrder().equals("whisper")) {
+								frame.chat.append("[귓속말(" + msg.getUserId() +")] : "+ msg.getValue() + "\n");
+
+							
 							}
 						}
 						// 서버에서 보낸 메시지가 에러일때 화면에 뿌려줌
