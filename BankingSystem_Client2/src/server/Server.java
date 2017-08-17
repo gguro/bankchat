@@ -392,6 +392,7 @@ public class Server extends Thread {
 				
 				if(list != null) {
 					TransactionMessage tMsg = new TransactionMessage(accountNo, list.size(), list);
+					tMsg.setOrder("transaction");
 					sendPrivate(tMsg);
 				}
 			} catch (BMSException e) {
